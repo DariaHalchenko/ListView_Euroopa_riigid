@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,5 +14,15 @@ namespace ListView_Euroopa_riigid
         public string Tootja { get; set; }
         public int Hind { get; set; }
         public string Pilt { get; set; }
+    }
+    public class Ruhm<K, T> : ObservableCollection<T>
+    {
+        public K Nimetus { get; private set; }
+        public Ruhm(K nimetus, IEnumerable<T> items)
+        {
+            Nimetus = nimetus;
+            foreach (T item in items)
+                Items.Add(item);
+        }
     }
 }

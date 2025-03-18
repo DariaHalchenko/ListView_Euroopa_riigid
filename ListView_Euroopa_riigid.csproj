@@ -58,6 +58,8 @@
 
 	<ItemGroup>
 	  <None Remove="Resources\Images\iPhone.jpg" />
+	  <None Remove="Resources\Images\iphone12.jpg" />
+	  <None Remove="Resources\Images\pilt.png" />
 	  <None Remove="Resources\Images\Samsung.jpg" />
 	  <None Remove="Resources\Images\Xiaomi.jpg" />
 	  <None Remove="Resources\Images\XiaomiNe.jpg" />
