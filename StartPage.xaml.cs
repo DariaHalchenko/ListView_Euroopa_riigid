@@ -2,8 +2,8 @@ namespace ListView_Euroopa_riigid;
 
 public partial class StartPage : ContentPage
 {
-    public List<ContentPage> lehed = new List<ContentPage>() {new List_Page() };
-    public List<string> tekstid = new List<string> { "Tee lahti List_Page" };
+    public List<ContentPage> lehed = new List<ContentPage>() {new List_Page(), new EuroopaRiigid_Page() };
+    public List<string> tekstid = new List<string> { "Tee lahti List_Page", "Tee Euroopa riigid" };
 
     ScrollView sv;
     VerticalStackLayout vsl;

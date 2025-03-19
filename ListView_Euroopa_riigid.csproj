@@ -57,10 +57,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\eesti.jpg" />
 	  <None Remove="Resources\Images\iPhone.jpg" />
 	  <None Remove="Resources\Images\iphone12.jpg" />
+	  <None Remove="Resources\Images\lati.jpg" />
+	  <None Remove="Resources\Images\leedu.jpg" />
 	  <None Remove="Resources\Images\pilt.png" />
+	  <None Remove="Resources\Images\rootsi.jpg" />
 	  <None Remove="Resources\Images\Samsung.jpg" />
+	  <None Remove="Resources\Images\soome.jpg" />
 	  <None Remove="Resources\Images\Xiaomi.jpg" />
 	  <None Remove="Resources\Images\XiaomiNe.jpg" />
 	</ItemGroup>

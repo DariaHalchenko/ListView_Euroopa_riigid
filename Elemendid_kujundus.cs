@@ -25,4 +25,13 @@ namespace ListView_Euroopa_riigid
                 Items.Add(item);
         }
     }
+    public class Euroopa
+    {
+        public string Nimetus { get; set; }
+        public string Pealinn { get; set; }
+        public int Rahvastiku_suurus { get; set; }
+        public string Lipp { get; set; }
+        public string Info { get; set; }
+        public string Keel { get; set; }
+    }
 }
