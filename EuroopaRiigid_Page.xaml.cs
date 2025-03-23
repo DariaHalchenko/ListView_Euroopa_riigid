@@ -8,10 +8,11 @@ public partial class EuroopaRiigid_Page : ContentPage
 
     Label lbl_list, lbl_nimetus, lbl_pealinn, lbl_rahvastiku_suurus, lbl_info, lbl_keel;
     ListView list;
-    Button lisa, btn_valifoto;
+    Button lisa, btn_valifoto, uuenda, kustuta;
     Entry e_nimetus, e_pealinn, e_rahvastiku_suurus, e_info, e_keel;
     Image ic;
     private string lisafoto;
+    private Euroopa andmeid;
 
     public EuroopaRiigid_Page()
     {
@@ -50,6 +51,11 @@ public partial class EuroopaRiigid_Page : ContentPage
 
         lisa = new Button { Text = "Lisa riik" };
         lisa.Clicked += Lisa_Clicked;
+        uuenda = new Button { Text = "Uuenda" }; 
+        uuenda.Clicked += Uuenda_Clicked;
+        kustuta = new Button { Text = "Kustuta telefn" };
+        kustuta.Clicked += Kustuta_Clicked;
+
 
         EuroopaRiigid = new ObservableCollection<Euroopa>
         {
@@ -111,10 +117,24 @@ public partial class EuroopaRiigid_Page : ContentPage
 
         list.ItemTapped += List_ItemTapped;
 
-        Content = new StackLayout
+        this.Content = new VerticalStackLayout
         {
-            Padding = new Thickness(10),
-            Children = { lbl_list, lbl_nimetus, e_nimetus, lbl_pealinn, e_pealinn, lbl_rahvastiku_suurus, e_rahvastiku_suurus, lbl_info, e_info, lbl_keel, e_keel, btn_valifoto, ic, lisa, list }
+            Children =
+            {
+                new VerticalStackLayout
+                {
+                    Children = { list }, 
+                    VerticalOptions = LayoutOptions.FillAndExpand 
+                },
+                new VerticalStackLayout
+                {
+                    Children = { lbl_list, lbl_nimetus, e_nimetus, lbl_pealinn, e_pealinn, 
+                                lbl_rahvastiku_suurus, e_rahvastiku_suurus, lbl_info, e_info, 
+                                lbl_keel, e_keel, btn_valifoto, ic, lisa, kustuta, uuenda },
+                    Padding = 10,
+                    VerticalOptions = LayoutOptions.End 
+                }
+            }
         };
     }
 
@@ -132,14 +152,8 @@ public partial class EuroopaRiigid_Page : ContentPage
         }
 
         if (string.IsNullOrEmpty(nimetus) || string.IsNullOrEmpty(pealinn) || string.IsNullOrEmpty(info) || string.IsNullOrEmpty(keel))
-    {
-            Shell.Current.DisplayAlert("Viga", "Palun sisestage kõik andmed!", "OK");
-            return;
-        }
-
-        if (EuroopaRiigid.Any(r => r.Nimetus.Equals(nimetus, StringComparison.OrdinalIgnoreCase)))
         {
-            Shell.Current.DisplayAlert("Viga", "Selline riik on juba nimekirjas!", "OK");
+            Shell.Current.DisplayAlert("Viga", "Palun sisestage kõik andmed!", "OK");
             return;
         }
 
@@ -149,29 +163,32 @@ public partial class EuroopaRiigid_Page : ContentPage
         {
             Nimetus = nimetus,
             Pealinn = pealinn,
-            Rahvastiku_suurus = rahvastik, // Теперь это число
+            Rahvastiku_suurus = rahvastik,
             Lipp = lipp,
             Info = info,
             Keel = keel
         };
 
         EuroopaRiigid.Add(uusRiik);
-        Shell.Current.DisplayAlert("Edu", "Riik edukalt lisatud!", "OK");
-
-        e_nimetus.Text = "";
-        e_pealinn.Text = "";
-        e_rahvastiku_suurus.Text = "";
-        e_info.Text = "";
-        e_keel.Text = "";
-        lisafoto = null;
-        ic.Source = "default_flag.png";
     }
+
     private async void List_ItemTapped(object? sender, ItemTappedEventArgs e)
     {
-        Euroopa selectedRiik = e.Item as Euroopa;
-        if (selectedRiik != null)
+        if (e.Item is Euroopa selectedRiik)
+        {
             await DisplayAlert("Euroopa riigid", $"{selectedRiik.Nimetus} - {selectedRiik.Info}", "OK");
+
+            andmeid = selectedRiik; 
+
+            e_nimetus.Text = andmeid.Nimetus;
+            e_pealinn.Text = andmeid.Pealinn;
+            e_rahvastiku_suurus.Text = andmeid.Rahvastiku_suurus.ToString();
+            e_info.Text = andmeid.Info;
+            e_keel.Text = andmeid.Keel;
+            ic.Source = ImageSource.FromFile(andmeid.Lipp);
+        }
     }
+
 
     private async void Btn_valifoto_Clicked(object sender, EventArgs e)
     {
@@ -186,5 +203,54 @@ public partial class EuroopaRiigid_Page : ContentPage
 
             ic.Source = ImageSource.FromFile(lisafoto);
         }
+    }
+
+    private void Kustuta_Clicked(object? sender, EventArgs e)
+    {
+        Euroopa euroopa = list.SelectedItem as Euroopa;
+        if (euroopa != null)
+        {
+            EuroopaRiigid.Remove(euroopa);
+            list.SelectedItem = null;
+        }
+    }
+
+    private void Uuenda_Clicked(object sender, EventArgs e)
+    {
+        if (andmeid == null)
+        {
+            Shell.Current.DisplayAlert("Viga", "Palun vali riik, mida uuendada!", "OK");
+            return;
+        }
+
+        string nimetus = e_nimetus.Text?.Trim();
+        string pealinn = e_pealinn.Text?.Trim();
+        string info = e_info.Text?.Trim();
+        string keel = e_keel.Text?.Trim();
+
+        if (!int.TryParse(e_rahvastiku_suurus.Text, out int rahvastik))
+        {
+            Shell.Current.DisplayAlert("Viga", "Rahvastiku suurus peab olema arv!", "OK");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(nimetus) || string.IsNullOrEmpty(pealinn) || string.IsNullOrEmpty(info) || string.IsNullOrEmpty(keel))
+        {
+            Shell.Current.DisplayAlert("Viga", "Palun sisestage kõik andmed!", "OK");
+            return;
+        }
+
+        andmeid.Nimetus = nimetus;
+        andmeid.Pealinn = pealinn;
+        andmeid.Rahvastiku_suurus = rahvastik;
+        andmeid.Info = info;
+        andmeid.Keel = keel;
+
+        if (!string.IsNullOrEmpty(lisafoto))
+        {
+            andmeid.Lipp = lisafoto;
+        }
+
+        list.SelectedItem = null;
     }
 }

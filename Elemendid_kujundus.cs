@@ -34,4 +34,16 @@ namespace ListView_Euroopa_riigid
         public string Info { get; set; }
         public string Keel { get; set; }
     }
+    public class EuroopaRuhm<K, T> : ObservableCollection<T> where T : Euroopa
+    {
+        public K Nimetus { get; private set; }
+        public EuroopaRuhm(K nimetus, IEnumerable<T> items)
+        {
+            Nimetus = nimetus;
+            foreach (T item in items.OrderBy(i => i.Nimetus))
+            {
+                Items.Add(item);
+            }
+        }
+    }
 }
