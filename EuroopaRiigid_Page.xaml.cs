@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.Maui.Controls;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ListView_Euroopa_riigid;
 
@@ -6,11 +8,12 @@ public partial class EuroopaRiigid_Page : ContentPage
 {
     public ObservableCollection<Euroopa> EuroopaRiigid { get; set; }
 
-    Label lbl_list, lbl_nimetus, lbl_pealinn, lbl_rahvastiku_suurus, lbl_info, lbl_keel;
+    Label lbl_list;
     ListView list;
-    Button lisa, btn_valifoto, uuenda, kustuta;
-    Entry e_nimetus, e_pealinn, e_rahvastiku_suurus, e_info, e_keel;
+    Button lisa, btn_valifoto, uuenda, kustuta, btn_tableview;
+    EntryCell ec_nimetus, ec_pealinn, ec_rahvastiku_suurus, ec_info, ec_keel;
     Image ic;
+    TableView tableview;
     private string lisafoto;
     private Euroopa andmeid;
 
@@ -23,39 +26,71 @@ public partial class EuroopaRiigid_Page : ContentPage
             FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label))
         };
 
-        lbl_nimetus = new Label { Text = "Riigi nimi: ", FontSize = 20 };
-        e_nimetus = new Entry { Placeholder = "Sisesta riigi nimi" };
+        ec_nimetus = new EntryCell 
+        { 
+            Placeholder = "Sisesta riigi nimi" 
+        };
+        ec_pealinn = new EntryCell 
+        { 
+            Placeholder = "Sisesta riigi pealinn" 
+        };
+        ec_rahvastiku_suurus = new EntryCell 
+        { 
+            Placeholder = "Sisesta riigi rahvastik", 
+            Keyboard = Keyboard.Numeric 
+        };
+        ec_info = new EntryCell 
+        { 
+            Placeholder = "Sisesta riigi info" 
+        };
+        ec_keel = new EntryCell 
+        { 
+            Placeholder = "Sisesta riigi keel" 
+        };
 
-        lbl_pealinn = new Label { Text = "Pealinn: ", FontSize = 20 };
-        e_pealinn = new Entry { Placeholder = "Sisesta riigi pealinn" };
-
-        lbl_rahvastiku_suurus = new Label { Text = "Rahvastik: ", FontSize = 20 };
-        e_rahvastiku_suurus = new Entry { Placeholder = "Sisesta riigi rahvastik", Keyboard = Keyboard.Numeric };
-
-        lbl_info = new Label { Text = "Info: ", FontSize = 20 };
-        e_info = new Entry { Placeholder = "Sisesta riigi info" };
-
-        lbl_keel = new Label { Text = "Keel: ", FontSize = 20 };
-        e_keel = new Entry { Placeholder = "Sisesta riigi keel" };
-
-        ic = new Image { WidthRequest = 100, HeightRequest = 60, Source = "default_flag.png" };
+        ic = new Image { WidthRequest = 60, HeightRequest = 60, Source = "pilt.png" };
 
         btn_valifoto = new Button
         {
             Text = "Vali lipp",
             BackgroundColor = Colors.LightGreen,
             TextColor = Colors.Black,
-            HorizontalOptions = LayoutOptions.Center
+            WidthRequest = 200
         };
         btn_valifoto.Clicked += Btn_valifoto_Clicked;
 
-        lisa = new Button { Text = "Lisa riik" };
-        lisa.Clicked += Lisa_Clicked;
-        uuenda = new Button { Text = "Uuenda" }; 
-        uuenda.Clicked += Uuenda_Clicked;
-        kustuta = new Button { Text = "Kustuta telefn" };
-        kustuta.Clicked += Kustuta_Clicked;
+        btn_tableview = new Button
+        {
+            Text = "Näita",
+            BackgroundColor = Colors.LightGreen,
+            TextColor = Colors.Black,
+            WidthRequest = 160
+        };
+        btn_tableview.Clicked += Btn_tableview_Clicked;
 
+        lisa = new Button 
+        { 
+            Text = "Lisa riik",  
+            BackgroundColor = Colors.LightGreen,
+            TextColor = Colors.Black,
+            WidthRequest = 200
+        };
+        lisa.Clicked += Lisa_Clicked;
+        uuenda = new Button 
+        { 
+            Text = "Uuenda",
+            BackgroundColor = Colors.LightGreen,
+            TextColor = Colors.Black,
+            WidthRequest = 160
+        }; 
+        uuenda.Clicked += Uuenda_Clicked;
+        kustuta = new Button 
+        { 
+            Text = "Kustuta",
+            BackgroundColor = Colors.LightGreen,
+            TextColor = Colors.Black
+        };
+        kustuta.Clicked += Kustuta_Clicked;
 
         EuroopaRiigid = new ObservableCollection<Euroopa>
         {
@@ -71,7 +106,8 @@ public partial class EuroopaRiigid_Page : ContentPage
         };
         list = new ListView
         {
-            SeparatorColor = Colors.Azure,
+            SeparatorColor = Colors.DarkViolet,
+            BackgroundColor = Colors.Cornsilk,
             Header = "Euroopa Riigid",
             Footer = DateTime.Now.ToString("T"),
             HasUnevenRows = true,
@@ -101,51 +137,91 @@ public partial class EuroopaRiigid_Page : ContentPage
                         Orientation = StackOrientation.Horizontal,
                         Padding = new Thickness(10),
                         Children =
-                {
-                    img,
-                    new StackLayout
-                    {
-                        Orientation = StackOrientation.Vertical,
-                        Padding = new Thickness(10, 0),
-                        Children = { nimetus, pealinn, keel, rahvastik }
-                    }
-                }
+                        {
+                            img,
+                            new StackLayout
+                            {
+                                Orientation = StackOrientation.Vertical,
+                                Padding = new Thickness(10, 0),
+                                Children = { nimetus, pealinn, keel, rahvastik }
+                            }
+                        }
                     }
                 };
             })
         };
 
         list.ItemTapped += List_ItemTapped;
-
-        this.Content = new VerticalStackLayout
+        tableview = new TableView
         {
+            Intent = TableIntent.Form, 
+            Root = new TableRoot("Andmete sisestamine")
+            {
+                new TableSection("Nimetus:")
+                {
+                    ec_nimetus
+                },
+                new TableSection("Pealinn:")
+                {
+                    ec_pealinn
+                },
+                new TableSection("Rahvastik:")
+                {
+                    ec_rahvastiku_suurus
+                },
+                new TableSection("Info:")
+                {
+                    ec_info
+                },
+                new TableSection("Keel:")
+                {
+                    ec_keel
+                },
+                new TableSection("Pilt:")
+                {
+                    new ViewCell { View = new Image { Source = ic.Source, WidthRequest = 60, HeightRequest = 60 } }
+                }
+            },
+            IsVisible = false
+        };
+
+        list.ItemTapped += List_ItemTapped;
+        this.Content = new StackLayout
+        {
+            Padding = new Thickness(10),
             Children =
             {
-                new VerticalStackLayout
+                lbl_list,
+                list,
+                tableview,
+                new HorizontalStackLayout
                 {
-                    Children = { list }, 
-                    VerticalOptions = LayoutOptions.FillAndExpand 
+                    HorizontalOptions = LayoutOptions.Center,
+                    Children = { btn_valifoto, btn_tableview }
                 },
-                new VerticalStackLayout
+                new HorizontalStackLayout
                 {
-                    Children = { lbl_list, lbl_nimetus, e_nimetus, lbl_pealinn, e_pealinn, 
-                                lbl_rahvastiku_suurus, e_rahvastiku_suurus, lbl_info, e_info, 
-                                lbl_keel, e_keel, btn_valifoto, ic, lisa, kustuta, uuenda },
-                    Padding = 10,
-                    VerticalOptions = LayoutOptions.End 
-                }
+                    HorizontalOptions = LayoutOptions.Center,
+                    Children = { lisa, uuenda }
+                },
+                kustuta
             }
         };
     }
 
+    private void Btn_tableview_Clicked(object? sender, EventArgs e)
+    {
+        tableview.IsVisible = !tableview.IsVisible;
+        btn_tableview.Text = tableview.IsVisible ? "Peida" : "Näita";
+    }
     private void Lisa_Clicked(object? sender, EventArgs e)
     {
-        string nimetus = e_nimetus.Text?.Trim();
-        string pealinn = e_pealinn.Text?.Trim();
-        string info = e_info.Text?.Trim();
-        string keel = e_keel.Text?.Trim();
+        string nimetus = ec_nimetus.Text?.Trim();
+        string pealinn = ec_pealinn.Text?.Trim();
+        string info = ec_info.Text?.Trim();
+        string keel = ec_keel.Text?.Trim();
 
-        if (!int.TryParse(e_rahvastiku_suurus.Text, out int rahvastik))
+        if (!int.TryParse(ec_rahvastiku_suurus.Text, out int rahvastik))
         {
             Shell.Current.DisplayAlert("Viga", "Rahvastiku suurus peab olema arv!", "OK");
             return;
@@ -157,8 +233,7 @@ public partial class EuroopaRiigid_Page : ContentPage
             return;
         }
 
-        string lipp = string.IsNullOrEmpty(lisafoto) ? "default_flag.png" : lisafoto;
-
+        string lipp = string.IsNullOrEmpty(lisafoto) ? "pilt.png" : lisafoto;
         Euroopa uusRiik = new Euroopa
         {
             Nimetus = nimetus,
@@ -180,11 +255,11 @@ public partial class EuroopaRiigid_Page : ContentPage
 
             andmeid = selectedRiik; 
 
-            e_nimetus.Text = andmeid.Nimetus;
-            e_pealinn.Text = andmeid.Pealinn;
-            e_rahvastiku_suurus.Text = andmeid.Rahvastiku_suurus.ToString();
-            e_info.Text = andmeid.Info;
-            e_keel.Text = andmeid.Keel;
+            ec_nimetus.Text = andmeid.Nimetus;
+            ec_pealinn.Text = andmeid.Pealinn;
+            ec_rahvastiku_suurus.Text = andmeid.Rahvastiku_suurus.ToString();
+            ec_info.Text = andmeid.Info;
+            ec_keel.Text = andmeid.Keel;
             ic.Source = ImageSource.FromFile(andmeid.Lipp);
         }
     }
@@ -195,15 +270,19 @@ public partial class EuroopaRiigid_Page : ContentPage
         FileResult foto = await MediaPicker.Default.PickPhotoAsync();
         if (foto != null)
         {
+            // Получаем путь и сохраняем в переменной lisafoto
             lisafoto = Path.Combine(FileSystem.CacheDirectory, foto.FileName);
 
+            // Открываем поток и сохраняем фото в директории
             using Stream sourceStream = await foto.OpenReadAsync();
             using FileStream localFileStream = File.OpenWrite(lisafoto);
             await sourceStream.CopyToAsync(localFileStream);
 
+            // Обновляем иконку с изображением
             ic.Source = ImageSource.FromFile(lisafoto);
         }
     }
+
 
     private void Kustuta_Clicked(object? sender, EventArgs e)
     {
@@ -215,7 +294,7 @@ public partial class EuroopaRiigid_Page : ContentPage
         }
     }
 
-    private void Uuenda_Clicked(object sender, EventArgs e)
+    private async void Uuenda_Clicked(object sender, EventArgs e)
     {
         if (andmeid == null)
         {
@@ -223,12 +302,12 @@ public partial class EuroopaRiigid_Page : ContentPage
             return;
         }
 
-        string nimetus = e_nimetus.Text?.Trim();
-        string pealinn = e_pealinn.Text?.Trim();
-        string info = e_info.Text?.Trim();
-        string keel = e_keel.Text?.Trim();
+        string nimetus = ec_nimetus.Text?.Trim();
+        string pealinn = ec_pealinn.Text?.Trim();
+        string info = ec_info.Text?.Trim();
+        string keel = ec_keel.Text?.Trim();
 
-        if (!int.TryParse(e_rahvastiku_suurus.Text, out int rahvastik))
+        if (!int.TryParse(ec_rahvastiku_suurus.Text, out int rahvastik))
         {
             Shell.Current.DisplayAlert("Viga", "Rahvastiku suurus peab olema arv!", "OK");
             return;
@@ -240,17 +319,45 @@ public partial class EuroopaRiigid_Page : ContentPage
             return;
         }
 
+        // Обновление данных
         andmeid.Nimetus = nimetus;
         andmeid.Pealinn = pealinn;
         andmeid.Rahvastiku_suurus = rahvastik;
         andmeid.Info = info;
         andmeid.Keel = keel;
 
+        // Обновление фотографии, если выбрана новая
         if (!string.IsNullOrEmpty(lisafoto))
         {
             andmeid.Lipp = lisafoto;
         }
 
+        // Обновление объекта в коллекции
+        int index = EuroopaRiigid.IndexOf(andmeid);
+        if (index != -1)
+        {
+            EuroopaRiigid[index] = new Euroopa
+            {
+                Nimetus = andmeid.Nimetus,
+                Pealinn = andmeid.Pealinn,
+                Rahvastiku_suurus = andmeid.Rahvastiku_suurus,
+                Info = andmeid.Info,
+                Keel = andmeid.Keel,
+                Lipp = andmeid.Lipp
+            };
+        }
+
+        // Обновляем источник данных в ListView
+        list.ItemsSource = null;
+        list.ItemsSource = EuroopaRiigid;
+
+        // Обновляем картинку в интерфейсе
+        if (!string.IsNullOrEmpty(andmeid.Lipp))
+        {
+            ic.Source = ImageSource.FromFile(andmeid.Lipp); // Обновляем источник изображения
+        }
+
+        // Снимаем выбор с элемента в ListView
         list.SelectedItem = null;
     }
 }

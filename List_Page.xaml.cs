@@ -9,7 +9,7 @@ public partial class List_Page : ContentPage
     public ObservableCollection<Ruhm<string, Telefon>> telefonideruhmades { get; set; }
     Label lbl_list;
     ListView list;
-    Button lisa, kustuta, btn_valifoto, btn_tableview, btn_lisa_andmed;
+    Button lisa, kustuta, btn_valifoto, btn_tableview; 
     EntryCell ec_nimetus, ec_tootja, ec_hind;
     ImageCell ic;
     private string lisafoto;
