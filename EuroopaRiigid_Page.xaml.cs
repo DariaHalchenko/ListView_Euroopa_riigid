@@ -99,10 +99,19 @@ public partial class EuroopaRiigid_Page : ContentPage
                 "Territoorium on jagatud 15 maakonnaks, 79 kohalikuks omavalitsuseks, millel on oma volikogu, " +
                 "eelarve ja maksustamisõigus. Kohalikud omavalitsused võivad teha koostööd teistega, " +
                 "et esindada tõhusalt huve erinevatel valitsemistasanditel.", Keel="eesti keel"},
-            new Euroopa {Nimetus = "Soome", Pealinn="Helsinki", Rahvastiku_suurus=5681803, Lipp="soome.jpg", Info="", Keel=""},
-            new Euroopa {Nimetus = "Läti", Pealinn="Riia", Rahvastiku_suurus=1369285, Lipp="lati.jpg", Info="", Keel=""},
-            new Euroopa {Nimetus = "Leedu", Pealinn="Vilnius", Rahvastiku_suurus=169285, Lipp="leedu.jpg", Info="", Keel=""},
-            new Euroopa {Nimetus = "Rootsi", Pealinn="Stockholm", Rahvastiku_suurus=1369285, Lipp="rootsi.jpg", Info="", Keel=""}
+            new Euroopa {Nimetus = "Soome", Pealinn="Helsinki", Rahvastiku_suurus=5568637, Lipp="soome.jpg", Info="Rootsi on riik Põhja-Euroopas, mis asub Skandinaavia poolsaarel. " +
+            "Ta piirneb Norra ja Soomega ning teda ümbritseb ka Läänemeri. Riigivormiks on konstitutsiooniline monarhia ja vääringuks Rootsi kroon (SEK)." +
+            " Riik on ELi liige, kuid ei kuulu euroalasse. Rootsi on tuntud oma kõrge elatustaseme, innovatsiooni, loodusmaastike ning ajalooliste losside " +
+            "ja viikingipärandi poolest.", Keel="soome keel"},
+            new Euroopa {Nimetus = "Läti", Pealinn="Riia", Rahvastiku_suurus=1850000, Lipp="lati.jpg", Info="Läti on riik Põhja-Euroopas Läänemere idarannikul. " +
+            "Piirneb Eesti, Leedu, Venemaa ja Valgevenega. Läti valitsemisvorm on parlamentaarne vabariik ja rahaühik on euro (EUR). Riik on ELi, NATO ja Schengeni " +
+            "ala liige. Läti on tuntud oma rikkaliku ajaloo, maalilise looduse, tihedate metsade ja liivarandade ning ainulaadse arhitektuuri, eriti juugendstiili poolest.", Keel="läti keel"},
+            new Euroopa {Nimetus = "Leedu", Pealinn="Vilnius", Rahvastiku_suurus=2800000, Lipp="leedu.jpg", Info="Leedu on riik Põhja-Euroopas Läänemere idarannikul." +
+            " Piirneb Läti, Poola, Valgevene ja Venemaaga. Riigivormiks on parlamentaarne vabariik ja vääringuks on euro (EUR). Leedu on ELi, NATO ja Schengeni ala liige. " +
+            "Riik on tuntud oma keskaegse ajaloo, maalilise looduse, tihedate metsade ja Kuramaa luidete, samuti iidsete losside ja arhitektuuripärandi poolest.", Keel="leedu keel"},
+            new Euroopa {Nimetus = "Rootsi", Pealinn="Stockholm", Rahvastiku_suurus=10500000, Lipp="rootsi.jpg", Info="Soome on riik Põhja-Euroopas, mis piirneb Rootsi, " +
+            "Norra ja Venemaaga ning Läänemerega. Riigivorm on parlamentaarne vabariik ja rahaühik on euro (EUR). Riik on ELi, Schengeni tsooni ja NATO " +
+            "liige. Soome on tuntud oma tuhandete järvede, tihedate metsade, põhjatule, saunade ja kõrge elatustaseme poolest.", Keel="rootsi keel"}
         };
         list = new ListView
         {
@@ -214,6 +223,7 @@ public partial class EuroopaRiigid_Page : ContentPage
         tableview.IsVisible = !tableview.IsVisible;
         btn_tableview.Text = tableview.IsVisible ? "Peida" : "Näita";
     }
+
     private void Lisa_Clicked(object? sender, EventArgs e)
     {
         string nimetus = ec_nimetus.Text?.Trim();
@@ -270,15 +280,10 @@ public partial class EuroopaRiigid_Page : ContentPage
         FileResult foto = await MediaPicker.Default.PickPhotoAsync();
         if (foto != null)
         {
-            // Получаем путь и сохраняем в переменной lisafoto
             lisafoto = Path.Combine(FileSystem.CacheDirectory, foto.FileName);
-
-            // Открываем поток и сохраняем фото в директории
             using Stream sourceStream = await foto.OpenReadAsync();
             using FileStream localFileStream = File.OpenWrite(lisafoto);
             await sourceStream.CopyToAsync(localFileStream);
-
-            // Обновляем иконку с изображением
             ic.Source = ImageSource.FromFile(lisafoto);
         }
     }
@@ -319,20 +324,17 @@ public partial class EuroopaRiigid_Page : ContentPage
             return;
         }
 
-        // Обновление данных
         andmeid.Nimetus = nimetus;
         andmeid.Pealinn = pealinn;
         andmeid.Rahvastiku_suurus = rahvastik;
         andmeid.Info = info;
         andmeid.Keel = keel;
 
-        // Обновление фотографии, если выбрана новая
         if (!string.IsNullOrEmpty(lisafoto))
         {
             andmeid.Lipp = lisafoto;
         }
 
-        // Обновление объекта в коллекции
         int index = EuroopaRiigid.IndexOf(andmeid);
         if (index != -1)
         {
@@ -346,18 +348,13 @@ public partial class EuroopaRiigid_Page : ContentPage
                 Lipp = andmeid.Lipp
             };
         }
-
-        // Обновляем источник данных в ListView
         list.ItemsSource = null;
         list.ItemsSource = EuroopaRiigid;
 
-        // Обновляем картинку в интерфейсе
         if (!string.IsNullOrEmpty(andmeid.Lipp))
         {
-            ic.Source = ImageSource.FromFile(andmeid.Lipp); // Обновляем источник изображения
+            ic.Source = ImageSource.FromFile(andmeid.Lipp); 
         }
-
-        // Снимаем выбор с элемента в ListView
         list.SelectedItem = null;
     }
 }
